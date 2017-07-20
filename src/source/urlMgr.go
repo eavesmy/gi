@@ -20,8 +20,8 @@ func redisClient() *redis.Client {
 	return client
 }
 
-func InsertURL(url string) {
-
+func InsertURL(url string) bool {
+	return false
 	err := redisClient().Set(url, "no", 0).Err()
 
 	if err != nil {

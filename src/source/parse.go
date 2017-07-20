@@ -1,8 +1,10 @@
 package source
 
 import (
+	"bufio"
 	"fmt"
-	"io/ioutil"
+	"io"
+	// "io/ioutil"
 	"net/http"
 	"regexp"
 	"strings"
@@ -32,26 +34,35 @@ func DealRes(res *http.Response) *Status {
 
 	resData.Head = res.Header
 
-	body, _ := ioutil.ReadAll(res.Body)
-	resData.Body = string(body)
+	// body, _ := ioutil.ReadAll(res.Body)
 	resData.Cookie = res.Cookies()
 
-	fmt.Println(resData.Body, 11111)
+	body := bufio.NewReader(res.Body)
 
-	/*
-		resData.Head = res.Header
-		resData.Body = res.Body
-		resData.Cookie = res.Cookies()
-	*/
+	for {
+		buf, _, state := body.ReadLine()
+
+		if state == io.EOF {
+			break
+		}
+
+		strs := string(buf)
+
+		urls := parseURL(strs)
+		keys := parseINFO(strs)
+
+		for _, url := range *urls {
+
+			if !strings.Contains(url, "com") {
+				url = res.Request.URL.Host + url
+				InsertURL(url)
+			}
+		}
+	}
 
 	return status
 }
 
-/*
-	@html [string]
-
-	returns [string]
-*/
 func realTag(src string) string {
 	//将HTML标签全转换成小写
 	re, _ := regexp.Compile("\\<[\\S\\s]+?\\>")
@@ -66,12 +77,47 @@ func realTag(src string) string {
 	src = re.ReplaceAllString(src, "")
 
 	//去除所有尖括号内的HTML代码，并换成换行符
-	re, _ = regexp.Compile("\\<[\\S\\s]+?\\>")
-	src = re.ReplaceAllString(src, "\n")
+	// re, _ = regexp.Compile("\\<[\\S\\s]+?\\>")
+	// src = re.ReplaceAllString(src, "\n")
 
 	//去除连续的换行符
 	re, _ = regexp.Compile("\\s{2,}")
 	src = re.ReplaceAllString(src, "\n")
 
 	return src
+}
+
+func parseURL(line string) *[]string {
+
+	urls := make([]string, 0)
+	p_urls := &urls
+
+	for _, str := range strings.Split(line, " ") {
+
+		if strings.Contains(str, "href") {
+
+			str = strings.NewReplacer("href=\"", "", "\"", "").Replace(str)
+
+			if strings.ContainsAny(str, ">") {
+
+				continue
+
+			}
+
+			*p_urls = append(*p_urls, str)
+
+		} else {
+
+			continue
+
+		}
+
+	}
+
+	return p_urls
+}
+
+func parseINFO(str string) *[]string {
+	strs := make([]string, 0)
+	p_strs := &strs
 }

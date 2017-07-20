@@ -9,9 +9,11 @@ var queue []string
 var dealingCount = 0
 
 func Start(urls []string, tags []string) {
+
 	for _, url := range urls {
 		InsertURL(url)
 	}
+
 	getURL()
 
 	for _, url := range queue {
