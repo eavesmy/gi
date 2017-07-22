@@ -21,7 +21,7 @@ type Status struct {
 	Url         string
 }
 
-func DealRes(res *http.Response) *Status {
+func DealRes(res *http.Response, keys []string) *Status {
 
 	status := &Status{}
 	status.GetHtmlCode = res.StatusCode == 200
@@ -33,8 +33,6 @@ func DealRes(res *http.Response) *Status {
 	resData := &ResData{}
 
 	resData.Head = res.Header
-
-	// body, _ := ioutil.ReadAll(res.Body)
 	resData.Cookie = res.Cookies()
 
 	body := bufio.NewReader(res.Body)
@@ -49,7 +47,9 @@ func DealRes(res *http.Response) *Status {
 		strs := string(buf)
 
 		urls := parseURL(strs)
-		keys := parseINFO(strs)
+		infos := parseINFO(strs, keys)
+
+		InsertINFO(infos)
 
 		for _, url := range *urls {
 
@@ -77,8 +77,8 @@ func realTag(src string) string {
 	src = re.ReplaceAllString(src, "")
 
 	//去除所有尖括号内的HTML代码，并换成换行符
-	// re, _ = regexp.Compile("\\<[\\S\\s]+?\\>")
-	// src = re.ReplaceAllString(src, "\n")
+	re, _ = regexp.Compile("\\<[\\S\\s]+?\\>")
+	src = re.ReplaceAllString(src, "\n")
 
 	//去除连续的换行符
 	re, _ = regexp.Compile("\\s{2,}")
@@ -117,7 +117,22 @@ func parseURL(line string) *[]string {
 	return p_urls
 }
 
-func parseINFO(str string) *[]string {
+func parseINFO(str string, keys []string) *[]string {
 	strs := make([]string, 0)
 	p_strs := &strs
+
+	str = realTag(str)
+
+	for i := 0; i < len(keys); i++ {
+		k := keys[i]
+
+		if strings.Contains(str, k) {
+			fmt.Println(str)
+			*p_strs = append(*p_strs, str)
+
+		}
+
+	}
+
+	return p_strs
 }

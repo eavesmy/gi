@@ -5,6 +5,7 @@ import (
 	// "fmt"
 	"github.com/go-redis/redis"
 	"strconv"
+	"strings"
 )
 
 func redisClient() *redis.Client {
@@ -20,31 +21,47 @@ func redisClient() *redis.Client {
 	return client
 }
 
-func InsertURL(url string) bool {
-	return false
-	err := redisClient().Set(url, "no", 0).Err()
+func InsertURL(url string) {
+
+	client := redisClient()
+	isDone := client.Get(url).Val()
+
+	defer client.Close()
+
+	if isDone != "" {
+		return
+	}
+
+	err := client.Set(url, "no", 0).Err()
 
 	if err != nil {
 		panic(err)
 	}
 }
 
-func GetURL() []string {
+func GetURL(count int) []string {
 
 	var notFinishedUrls []string
 
-	urls := redisClient().Keys("*").Val()
+	client := redisClient()
+	urls := client.Keys("*").Val()
+
+	defer client.Close()
 
 	for _, url := range urls {
-		isDone := redisClient().Get(url).Val()
+		isDone := client.Get(url).Val()
 
 		if isDone == "yes" {
 			continue
 		}
 
+		if !strings.Contains(url, "http") {
+			url = "http://" + url
+		}
+
 		notFinishedUrls = append(notFinishedUrls, url)
 
-		if len(notFinishedUrls) > 5 {
+		if len(notFinishedUrls) > count {
 			break
 		}
 	}
@@ -53,10 +70,13 @@ func GetURL() []string {
 }
 
 func UpdateURL(status *Status) {
-	//更新url
+
+	client := redisClient()
+
 	if status.GetHtmlCode {
-		redisClient().Set(status.Url, "yes", 0)
+		client.Set(status.Url, "yes", 0)
 	} else {
-		redisClient().Set(status.Url, "faild", 0)
+		client.Set(status.Url, "faild", 0)
 	}
+	defer client.Close()
 }

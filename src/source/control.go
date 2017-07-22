@@ -1,40 +1,42 @@
 package source
 
 import (
-	// "fmt"
-	"github.com/zdy23216340/gtool"
+	"fmt"
+	// "github.com/zdy23216340/gtool"
 )
 
 var queue []string
 var dealingCount = 0
 
-func Start(urls []string, tags []string) {
+func Start(urls []string, keys []string) {
 
 	for _, url := range urls {
 		InsertURL(url)
 	}
 
-	getURL()
+	parse(keys)
+}
 
-	for _, url := range queue {
+func parse(keys []string) {
+
+	queue = GetURL(5)
+
+	if len(queue) == 0 {
+		fmt.Println("All HTML parse done.")
+		return
+	}
+
+	for i := 0; i < len(queue); i++ {
+		url := queue[i]
+
+		fmt.Println("Deal url ->", url)
 		res := Http(url)
 
-		status := DealRes(res)
+		status := DealRes(res, keys)
 		status.Url = url
 
 		UpdateURL(status)
 	}
-}
 
-func getURL() {
-	urls := GetURL()
-
-	for _, url := range urls {
-
-		if gtool.GetIndex(queue, url) > -1 {
-			continue
-		}
-
-		queue = append(queue, url)
-	}
+	parse(keys)
 }
