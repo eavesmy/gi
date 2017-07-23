@@ -2,22 +2,27 @@ package source
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
 	// "github.com/zdy23216340/gtool"
 )
 
 var queue []string
 var dealingCount = 0
+var Info = map[string]string{}
 
-func Start(urls []string, keys []string) {
+func Start(w http.ResponseWriter, req *http.Request) {
 
-	for _, url := range urls {
-		InsertURL(url)
+	if !strings.Contains(req.RemoteAddr, "127.0.0.1") {
+		return
 	}
 
-	parse(keys)
+	config := req.ParseForm()
+
+	fmt.Println(config)
 }
 
-func parse(keys []string) {
+func parse(keys *[]string) {
 
 	queue = GetURL(5)
 
@@ -29,14 +34,22 @@ func parse(keys []string) {
 	for i := 0; i < len(queue); i++ {
 		url := queue[i]
 
-		fmt.Println("Deal url ->", url)
 		res := Http(url)
 
-		status := DealRes(res, keys)
-		status.Url = url
+		fmt.Println(res.Header["meta"])
+		// status := DealRes(res, keys)
+		// status.Url = url
 
-		UpdateURL(status)
+		// UpdateURL(status)
 	}
 
 	parse(keys)
+}
+
+func parseInfoStruct(keys *[]string) {
+
+	for _, key := range *keys {
+
+		Info[key] = ""
+	}
 }

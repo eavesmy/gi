@@ -2,7 +2,7 @@ package source
 
 import (
 	"bufio"
-	"fmt"
+	// "fmt"
 	"io"
 	// "io/ioutil"
 	"net/http"
@@ -47,9 +47,15 @@ func DealRes(res *http.Response, keys []string) *Status {
 		strs := string(buf)
 
 		urls := parseURL(strs)
-		infos := parseINFO(strs, keys)
 
-		InsertINFO(infos)
+		c := make(chan bool)
+
+		go func() {
+			InsertINFO(parseINFO(strs, keys))
+			close(c)
+		}()
+
+		<-c
 
 		for _, url := range *urls {
 
@@ -127,7 +133,6 @@ func parseINFO(str string, keys []string) *[]string {
 		k := keys[i]
 
 		if strings.Contains(str, k) {
-			fmt.Println(str)
 			*p_strs = append(*p_strs, str)
 
 		}

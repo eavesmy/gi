@@ -1,9 +1,11 @@
 package main
 
 import (
+	"./config"
 	"./source"
 	"bufio"
 	"io"
+	"net/http"
 	"os"
 	"strings"
 )
@@ -12,15 +14,16 @@ const CONFIG_PATH = "./config.txt"
 
 func main() {
 
-	urls, tags := getConfig()
+	http.HandleFunc("/", source.Start)
 
-	source.Start(urls, tags)
+	http.ListenAndServe(config.Get("SERVER_PORT"), nil)
 }
 
-func getConfig() ([]string, []string) {
+func getConfig() ([]string, *[]string) {
 
 	var Urls []string
-	var KeyWords []string
+	KeyWords := make([]string, 0)
+	keys := &KeyWords
 
 	fi, err := os.Open(CONFIG_PATH)
 
@@ -47,9 +50,9 @@ func getConfig() ([]string, []string) {
 
 		} else {
 
-			KeyWords = append(KeyWords, str)
+			*keys = append(*keys, str)
 		}
 	}
 
-	return Urls, KeyWords
+	return Urls, keys
 }
