@@ -1,9 +1,10 @@
 package source
 
 import (
+	"../manager"
 	"fmt"
 	"net/http"
-	"strings"
+	"net/url"
 	// "github.com/zdy23216340/gtool"
 )
 
@@ -13,43 +14,18 @@ var Info = map[string]string{}
 
 func Start(w http.ResponseWriter, req *http.Request) {
 
-	if !strings.Contains(req.RemoteAddr, "127.0.0.1") {
+	if !fromLocal(req.Host) {
 		return
 	}
 
-	config := req.ParseForm()
+	body := manager.GetBody(req)
 
-	fmt.Println(config)
 }
 
-func parse(keys *[]string) {
+func fromLocal(host string) bool {
+	_url, _ := url.Parse("http://" + host)
 
-	queue = GetURL(5)
+	_host := _url.Hostname()
 
-	if len(queue) == 0 {
-		fmt.Println("All HTML parse done.")
-		return
-	}
-
-	for i := 0; i < len(queue); i++ {
-		url := queue[i]
-
-		res := Http(url)
-
-		fmt.Println(res.Header["meta"])
-		// status := DealRes(res, keys)
-		// status.Url = url
-
-		// UpdateURL(status)
-	}
-
-	parse(keys)
-}
-
-func parseInfoStruct(keys *[]string) {
-
-	for _, key := range *keys {
-
-		Info[key] = ""
-	}
+	return (_host == "localhost" || _host == "127.0.0.1")
 }
