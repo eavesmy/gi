@@ -2,7 +2,6 @@ package source
 
 import (
 	"../manager"
-	"fmt"
 	"net/http"
 	"net/url"
 	// "github.com/zdy23216340/gtool"
@@ -20,6 +19,7 @@ func Start(w http.ResponseWriter, req *http.Request) {
 
 	body := manager.GetBody(req)
 
+	InsertURL(body.Domin)
 }
 
 func fromLocal(host string) bool {

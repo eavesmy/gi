@@ -21,6 +21,10 @@ func redisClient() *redis.Client {
 	return client
 }
 
+func InitURL(url string) {
+
+}
+
 func InsertURL(url string) {
 
 	client := redisClient()
