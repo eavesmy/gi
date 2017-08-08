@@ -2,7 +2,6 @@ package source
 
 import (
 	"../manager"
-	"io/ioutil"
 	"strings"
 )
 
@@ -38,13 +37,12 @@ func (o *One) Run_(url string) {
 
 	url = FormatURL(url)
 
-	res := Http(url)
+	if o.ParseHTML(url) {
 
-	body, _ := ioutil.ReadAll(res.Body)
+		o.Complete_()
 
-	res.Body.Close()
+	}
 
-	ParseHTML(body)
 }
 
 func NewTask(body *manager.Info) {
