@@ -7,9 +7,9 @@ import (
 	// "github.com/zdy23216340/gtool"
 )
 
-var queue []string
-var dealingCount = 0
-var Info = map[string]string{}
+const MaxDealProcess = 5
+
+var DealingCount = 0
 
 func Start(w http.ResponseWriter, req *http.Request) {
 
@@ -19,7 +19,9 @@ func Start(w http.ResponseWriter, req *http.Request) {
 
 	body := manager.GetBody(req)
 
-	InsertURL(body.Domin)
+	go NewTask(body)
+
+	w.Write([]byte("oooooo"))
 }
 
 func fromLocal(host string) bool {

@@ -8,6 +8,15 @@ import (
 	"strings"
 )
 
+func FormatURL(url string) string {
+
+	if !strings.Contains(url, "http") {
+		url = "http://" + url
+	}
+
+	return url
+}
+
 func redisClient() *redis.Client {
 
 	db, _ := strconv.Atoi(config.Get("REDIS_URL_DB"))
@@ -21,11 +30,11 @@ func redisClient() *redis.Client {
 	return client
 }
 
-func InitURL(url string) {
-
-}
-
 func InsertURL(url string) {
+
+	if !strings.Contains(url, "http") {
+		url = "http://" + url
+	}
 
 	client := redisClient()
 	isDone := client.Get(url).Val()

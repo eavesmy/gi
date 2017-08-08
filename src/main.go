@@ -3,14 +3,8 @@ package main
 import (
 	"./config"
 	"./source"
-	"bufio"
-	"io"
 	"net/http"
-	"os"
-	"strings"
 )
-
-const CONFIG_PATH = "./config.txt"
 
 func main() {
 

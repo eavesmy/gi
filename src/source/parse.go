@@ -2,7 +2,7 @@ package source
 
 import (
 	"bufio"
-	// "fmt"
+	"fmt"
 	"io"
 	// "io/ioutil"
 	"net/http"
@@ -19,6 +19,10 @@ type ResData struct {
 type Status struct {
 	GetHtmlCode bool
 	Url         string
+}
+
+func ParseHTML(html []byte) {
+	fmt.Println(html)
 }
 
 func DealRes(res *http.Response, keys []string) *Status {
