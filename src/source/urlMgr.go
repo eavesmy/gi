@@ -1,10 +1,13 @@
 package source
 
 import (
-	"../config"
-	"fmt"
 	"strings"
 )
+
+type UrlState struct {
+	State string
+	Url   string
+}
 
 func FormatURL(url string) string {
 
@@ -36,19 +39,15 @@ func ParseDomin(url string) string {
 
 func SaveURL(url string) bool {
 
-	v, err := NewRedisClient.Get(url).Result()
+	v, err := UrlClient.Get(url).Result()
+	//1.get 2.
 
-	if err != nil {
+	if err != nil && v == "" {
 
-		_err := NewRedisClient.Set(url, config.Get("URL_UNEXISTS"), 0).Err()
-
-		if _err != nil {
-			fmt.Println("Insert url failed")
-		}
-		return false
 	}
 
-	fmt.Println(111, v)
-
-	return true
+	return false
 }
+
+//func GetURL() *[]string {
+//}

@@ -1,6 +1,7 @@
 package source
 
 import (
+	"../config"
 	"../manager"
 	"github.com/go-redis/redis"
 	"net/http"
@@ -11,7 +12,8 @@ import (
 const MaxDealProcess = 5
 
 var DealingCount = 0
-var NewRedisClient *redis.Client
+var UrlClient *redis.Client
+var UrlMapClient *redis.Client
 
 func Start(w http.ResponseWriter, req *http.Request) {
 
@@ -27,7 +29,8 @@ func Start(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Init redis & couchdb
-	NewRedisClient = manager.NewRedisClient()
+	UrlClient = manager.NewRedisClient(config.Get("REDIS_URL_DB"))
+	UrlMapClient = manager.NewRedisClient(config.Get("REDIS_URL_CACHE_DB"))
 
 	go NewTask(body)
 

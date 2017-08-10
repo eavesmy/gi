@@ -27,13 +27,13 @@ func GetBody(req *http.Request) *Info {
 	return info
 }
 
-func NewRedisClient() *redis.Client {
+func NewRedisClient(db string) *redis.Client {
 
-	db, _ := strconv.Atoi(config.Get("REDIS_URL_DB"))
+	dbNum, _ := strconv.Atoi(db)
 
 	return redis.NewClient(&redis.Options{
 		Addr:     config.Get("REDIS_HOST"),
 		Password: "",
-		DB:       db,
+		DB:       dbNum,
 	})
 }
