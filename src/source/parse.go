@@ -3,21 +3,33 @@ package source
 import (
 	"fmt"
 	"github.com/opesun/goquery"
+	"sync"
 )
 
 func (o *One) ParseHTML(url string) bool {
+
+	fmt.Println("Get URL ->", url)
+
 	doc, err := goquery.ParseUrl(url)
 
 	if err != nil {
 		return false
 	}
 
-	go parseURL(doc)
+	var todo sync.WaitGroup
+	todo.Add(2)
+
+	go parseURL(doc, todo)
+	go parseINFO(doc, todo)
+
+	todo.Wait()
 
 	return true
 }
 
-func parseURL(doc goquery.Nodes) {
+func parseURL(doc goquery.Nodes, todo sync.WaitGroup) {
+
+	defer todo.Done()
 
 	hrefs := doc.Find("a")
 
@@ -25,8 +37,12 @@ func parseURL(doc goquery.Nodes) {
 
 		url := hrefs.Eq(i).Attr("href")
 
-		fmt.Println(url)
+		SaveURL(FormatURL(url))
 
 	}
 
+}
+
+func parseINFO(doc goquery.Nodes, todo sync.WaitGroup) {
+	defer todo.Done()
 }

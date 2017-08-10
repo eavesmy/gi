@@ -6,6 +6,7 @@ var m = map[string]string{
 	"REDIS_HOST":   "localhost:8004",
 	"REDIS_URL_DB": "1",
 	"SERVER_PORT":  ":8005",
+	"URL_UNEXISTS": "2",
 }
 
 func Get(k string) string {

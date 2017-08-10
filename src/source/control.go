@@ -2,6 +2,7 @@ package source
 
 import (
 	"../manager"
+	"github.com/go-redis/redis"
 	"net/http"
 	"net/url"
 	// "github.com/zdy23216340/gtool"
@@ -10,6 +11,7 @@ import (
 const MaxDealProcess = 5
 
 var DealingCount = 0
+var NewRedisClient *redis.Client
 
 func Start(w http.ResponseWriter, req *http.Request) {
 
@@ -19,9 +21,17 @@ func Start(w http.ResponseWriter, req *http.Request) {
 
 	body := manager.GetBody(req)
 
+	if DoingTask != nil {
+		w.Write([]byte("Already has a task running"))
+		return
+	}
+
+	// Init redis & couchdb
+	NewRedisClient = manager.NewRedisClient()
+
 	go NewTask(body)
 
-	w.Write([]byte("oooooo"))
+	w.Write([]byte("Task Added"))
 }
 
 func fromLocal(host string) bool {

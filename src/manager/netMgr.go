@@ -1,9 +1,12 @@
 package manager
 
 import (
+	"../config"
 	"encoding/json"
+	"github.com/go-redis/redis"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 )
 
 type Info struct {
@@ -22,4 +25,15 @@ func GetBody(req *http.Request) *Info {
 	json.Unmarshal([]byte(body), info)
 
 	return info
+}
+
+func NewRedisClient() *redis.Client {
+
+	db, _ := strconv.Atoi(config.Get("REDIS_URL_DB"))
+
+	return redis.NewClient(&redis.Options{
+		Addr:     config.Get("REDIS_HOST"),
+		Password: "",
+		DB:       db,
+	})
 }
