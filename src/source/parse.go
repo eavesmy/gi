@@ -1,6 +1,7 @@
 package source
 
 import (
+	// "fmt"
 	"github.com/opesun/goquery"
 	"sync"
 )
@@ -12,22 +13,24 @@ type ParseBody struct {
 
 func (o *One) ParseHTML(url string) *ParseBody {
 
+	// fmt.Println("GET THIS URL ->", url)
 	doc, _ := goquery.ParseUrl(url)
 
 	dataBody := &ParseBody{}
+	dataBody.Url = url
 
 	var todo sync.WaitGroup
 	todo.Add(2)
 
-	go parseURL(doc, todo, dataBody)
-	go parseINFO(doc, todo, dataBody)
+	go parseURL(doc, todo)
+	go parseINFO(doc, todo, dataBody, o.Keys)
 
 	todo.Wait()
 
 	return dataBody
 }
 
-func parseURL(doc goquery.Nodes, todo sync.WaitGroup, dataBody *ParseBody) {
+func parseURL(doc goquery.Nodes, todo sync.WaitGroup) {
 
 	defer todo.Done()
 
@@ -43,6 +46,8 @@ func parseURL(doc goquery.Nodes, todo sync.WaitGroup, dataBody *ParseBody) {
 
 }
 
-func parseINFO(doc goquery.Nodes, todo sync.WaitGroup, dataBody *ParseBody) {
+func parseINFO(doc goquery.Nodes, todo sync.WaitGroup, dataBody *ParseBody, keys *[]string) {
+
 	defer todo.Done()
+
 }

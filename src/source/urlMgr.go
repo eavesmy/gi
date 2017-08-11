@@ -3,6 +3,7 @@ package source
 import (
 	"fmt"
 	"strings"
+	"time"
 )
 
 type UrlState struct {
@@ -39,14 +40,14 @@ func ParseDomin(url string) string {
 }
 
 func SaveURL(url string) bool {
-	//TODO : Fix this.
-	UrlClient.LPush("REDIS_URL_PREPARE_LIST", url)
+
+	UrlClient.LPush("REDIS_URL_PREPARE_LIST", url).Result()
 
 	return false
 }
 
 func GetURL() string {
-	url := GetURL()
+	url := getURL()
 
 	if url == "" {
 		url = GetURL()
@@ -56,15 +57,20 @@ func GetURL() string {
 }
 
 func getURL() string {
-	v := UrlClient.LIndex("REDIS_URL_PREPARE_LIST", -1).String()
+	v := UrlClient.BLPop(time.Second*1, "REDIS_URL_PREPARE_LIST").Val()
 
-	if v == UrlDoneClient.Get(v).String() {
+	if len(v) == 0 {
+		return ""
+	}
+
+	// UrlDoneClient.Get().String() -> Check output
+	if v[1] == UrlDoneClient.Get(v[1]).String() {
 
 		return ""
 
 	} else {
 
-		return v
+		return v[1]
 
 	}
 }
