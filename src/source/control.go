@@ -13,7 +13,7 @@ const MaxDealProcess = 5
 
 var DealingCount = 0
 var UrlClient *redis.Client
-var UrlMapClient *redis.Client
+var UrlDoneClient *redis.Client
 
 func Start(w http.ResponseWriter, req *http.Request) {
 
@@ -28,9 +28,9 @@ func Start(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// Init redis & couchdb
+	//Init redis client
 	UrlClient = manager.NewRedisClient(config.Get("REDIS_URL_DB"))
-	UrlMapClient = manager.NewRedisClient(config.Get("REDIS_URL_CACHE_DB"))
+	UrlDoneClient = manager.NewRedisClient(config.Get("REDIS_URL_DONE_DB"))
 
 	go NewTask(body)
 

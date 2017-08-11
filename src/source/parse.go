@@ -5,26 +5,29 @@ import (
 	"sync"
 )
 
-func (o *One) ParseHTML(url string) bool {
+type ParseBody struct {
+	Url  string
+	Body map[string]string
+}
 
-	doc, err := goquery.ParseUrl(url)
+func (o *One) ParseHTML(url string) *ParseBody {
 
-	if err != nil {
-		return false
-	}
+	doc, _ := goquery.ParseUrl(url)
+
+	dataBody := &ParseBody{}
 
 	var todo sync.WaitGroup
 	todo.Add(2)
 
-	go parseURL(doc, todo)
-	go parseINFO(doc, todo)
+	go parseURL(doc, todo, dataBody)
+	go parseINFO(doc, todo, dataBody)
 
 	todo.Wait()
 
-	return true
+	return dataBody
 }
 
-func parseURL(doc goquery.Nodes, todo sync.WaitGroup) {
+func parseURL(doc goquery.Nodes, todo sync.WaitGroup, dataBody *ParseBody) {
 
 	defer todo.Done()
 
@@ -40,7 +43,6 @@ func parseURL(doc goquery.Nodes, todo sync.WaitGroup) {
 
 }
 
-func parseINFO(doc goquery.Nodes, todo sync.WaitGroup) {
+func parseINFO(doc goquery.Nodes, todo sync.WaitGroup, dataBody *ParseBody) {
 	defer todo.Done()
-
 }

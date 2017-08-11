@@ -41,9 +41,9 @@ func (o *One) Run_(url string) {
 
 	url = FormatURL(url)
 
-	if o.ParseHTML(url) {
+	data := o.ParseHTML(url)
 
-	}
+	fmt.Println(data)
 }
 
 func NewTask(body *manager.Info) {
@@ -57,11 +57,9 @@ func NewTask(body *manager.Info) {
 		one.Keys = append(one.Keys, k)
 	}
 
-	UrlList <- one.Domin
-
-	fmt.Println("Start a new task")
+	SaveURL(one.Domin)
 
 	for {
-		go one.Run_(<-UrlList)
+		go one.Run_(GetURL())
 	}
 }

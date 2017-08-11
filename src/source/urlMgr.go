@@ -1,6 +1,7 @@
 package source
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -38,16 +39,40 @@ func ParseDomin(url string) string {
 }
 
 func SaveURL(url string) bool {
-
-	v, err := UrlClient.Get(url).Result()
-	//1.get 2.
-
-	if err != nil && v == "" {
-
-	}
+	//TODO : Fix this.
+	UrlClient.LPush("REDIS_URL_PREPARE_LIST", url)
 
 	return false
 }
 
-//func GetURL() *[]string {
-//}
+func GetURL() string {
+	url := GetURL()
+
+	if url == "" {
+		url = GetURL()
+	}
+
+	return url
+}
+
+func getURL() string {
+	v := UrlClient.LIndex("REDIS_URL_PREPARE_LIST", -1).String()
+
+	if v == UrlDoneClient.Get(v).String() {
+
+		return ""
+
+	} else {
+
+		return v
+
+	}
+}
+
+func DoneURL(url string) {
+	err := UrlDoneClient.Set(url, true, 0).Err()
+
+	if err != nil {
+		fmt.Println("Done a url ->", url, ",but some thing error here.")
+	}
+}
