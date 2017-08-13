@@ -2,6 +2,7 @@ package source
 
 import (
 	"../manager"
+	// "fmt"
 	"strings"
 )
 
@@ -63,7 +64,10 @@ func NewTask(body *manager.Info) {
 
 	SaveURL(one.Domin)
 
+	GetURL()
+
 	for {
-		go one.Run_(GetURL())
+		go one.Run_(<-UrlList)
 	}
+
 }

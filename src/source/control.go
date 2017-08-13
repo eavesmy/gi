@@ -1,19 +1,15 @@
 package source
 
 import (
-	"../config"
 	"../manager"
-	"github.com/go-redis/redis"
 	"net/http"
 	"net/url"
 	// "github.com/zdy23216340/gtool"
 )
 
-const MaxDealProcess = 5
+const MaxDealProcess = 1
 
 var DealingCount = 0
-var UrlClient *redis.Client
-var UrlDoneClient *redis.Client
 
 func Start(w http.ResponseWriter, req *http.Request) {
 
@@ -29,8 +25,6 @@ func Start(w http.ResponseWriter, req *http.Request) {
 	}
 
 	//Init redis client
-	UrlClient = manager.NewRedisClient(config.Get("REDIS_URL_DB"))
-	UrlDoneClient = manager.NewRedisClient(config.Get("REDIS_URL_DONE_DB"))
 
 	go NewTask(body)
 

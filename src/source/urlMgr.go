@@ -1,9 +1,10 @@
 package source
 
 import (
+	"../config"
+	"../manager"
 	"fmt"
 	"strings"
-	"time"
 )
 
 type UrlState struct {
@@ -41,43 +42,49 @@ func ParseDomin(url string) string {
 
 func SaveURL(url string) bool {
 
-	UrlClient.LPush("REDIS_URL_PREPARE_LIST", url)
+	c := manager.NewRedisClient(config.Get("URL_DB"))
 
-	return false
-}
+	defer c.Close()
 
-func GetURL() string {
-	url := getURL()
+	err := c.SAdd("REDIS_URL_PREPARE_LIST", url).Err()
 
-	if url == "" {
-		url = GetURL()
+	if err != nil {
+		fmt.Println("Save url err ->", err)
+
+		return false
 	}
 
-	return url
+	return true
+}
+
+func GetURL() {
+	url := getURL()
+
+	if url != "" {
+		UrlList <- url
+	}
 }
 
 func getURL() string {
-	v := UrlClient.BLPop(0, "REDIS_URL_PREPARE_LIST").Val()
+	c := manager.NewRedisClient(config.Get("URL_DB"))
 
-	if len(v) == 0 {
-		return ""
-	}
+	defer c.Close()
 
-	if v[1] == UrlDoneClient.Get(v[1]).Val() {
+	return c.SPop("REDIS_URL_PREPARE_LIST").Val()
 
-		return ""
-
-	} else {
-
-		return v[1]
-
-	}
 }
 
 func DoneURL(url string) {
-	err := UrlDoneClient.Set(url, true, 0).Err()
+
+	c := manager.NewRedisClient(config.Get("URL_DB"))
+
+	defer c.Close()
+
+	state, err := c.SMove("REDIS_URL_PREPARE_LIST", "REDIS_URL_DONE_LIST", url).Result()
 
 	if err != nil {
-		fmt.Println("Done a url ->", url, ",but some thing error here.")
+		fmt.Println("Done url err->", err)
 	}
+
+	fmt.Println("Done url ->", state)
 }

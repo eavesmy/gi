@@ -7,9 +7,7 @@ var m = map[string]string{
 	"REDIS_URL_DB":      "1",
 	"REDIS_URL_DONE_DB": "2",
 	"SERVER_PORT":       ":8005",
-	"URL_UNREPTIL":      "1",
-	"URL_REPTILED":      "2",
-	"URL_DONE":          "3",
+	"URL_DB":            "1",
 }
 
 func Get(k string) string {
