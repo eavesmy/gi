@@ -41,7 +41,7 @@ func ParseDomin(url string) string {
 
 func SaveURL(url string) bool {
 
-	UrlClient.LPush("REDIS_URL_PREPARE_LIST", url).Result()
+	UrlClient.LPush("REDIS_URL_PREPARE_LIST", url)
 
 	return false
 }
@@ -57,14 +57,13 @@ func GetURL() string {
 }
 
 func getURL() string {
-	v := UrlClient.BLPop(time.Second*1, "REDIS_URL_PREPARE_LIST").Val()
+	v := UrlClient.BLPop(0, "REDIS_URL_PREPARE_LIST").Val()
 
 	if len(v) == 0 {
 		return ""
 	}
 
-	// UrlDoneClient.Get().String() -> Check output
-	if v[1] == UrlDoneClient.Get(v[1]).String() {
+	if v[1] == UrlDoneClient.Get(v[1]).Val() {
 
 		return ""
 
