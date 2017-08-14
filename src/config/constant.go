@@ -8,6 +8,8 @@ var m = map[string]string{
 	"REDIS_URL_DONE_DB": "2",
 	"SERVER_PORT":       ":8005",
 	"URL_DB":            "1",
+	"TASK_DONE":         "1",
+	"TASK_DOING":        "2",
 }
 
 func Get(k string) string {

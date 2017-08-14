@@ -1,73 +1,41 @@
 package source
 
-import (
-	"../manager"
-	// "fmt"
-	"strings"
-)
+import ()
 
-type One struct {
-	State    string
-	Id       string
-	Domin    string
-	Urls     int
-	Complete int
-	Status   bool
-	Undo     *[]string
-	Done     int
-	Keys     *[]string
+const maxDealProcess = 5
+
+var programState *Task
+
+type Task struct {
+	Total     int
+	Compelete int
+	Faild     int
+	Domin     string
+	Keys      string
+	State     int
 }
 
-type SaveData struct {
-	Url  string
-	Info map[string]string
+// var TaskList = make(chan *One, maxDealProcess)
+var UrlList = make(chan string, maxDealProcess)
+
+func (t *Task) runTask() {
+
 }
 
-var UrlList = make(chan string, MaxDealProcess)
-var InfoList = make(chan SaveData, 1)
-var DoingTask *One
+func NewTask(body *manager.Info) bool {
 
-func (o *One) AddUrl_() {
-	o.Urls++
-}
-
-func (o *One) Complete_(url string) {
-	DoneURL(url)
-	o.Complete++
-}
-
-func (o *One) Run_(url string) {
-
-	o.AddUrl_()
-
-	url = FormatURL(url)
-
-	o.ParseHTML(url)
-
-	o.Complete_(url)
-}
-
-func NewTask(body *manager.Info) {
-
-	one := &One{}
-
-	keys := make([]string, 0)
-	one.Keys = &keys
-
-	DoingTask = one
-
-	one.Domin = FormatDomin(body.Domin)
-
-	for _, k := range strings.Split(body.Main, ",") {
-		*one.Keys = append(*one.Keys, k)
+	if programState != nil {
+		return false
 	}
 
-	SaveURL(one.Domin)
+	task := &Task{}
 
-	GetURL()
+	task.Domin = body.Domin
+	task.Keys = body.main
 
-	for {
-		go one.Run_(<-UrlList)
-	}
+	UrlList <- task.Domin
 
+	go task.runTask()
+
+	return true
 }

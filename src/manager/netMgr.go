@@ -6,6 +6,7 @@ import (
 	"github.com/go-redis/redis"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strconv"
 )
 
@@ -36,4 +37,13 @@ func NewRedisClient(db string) *redis.Client {
 		Password: "",
 		DB:       dbNum,
 	})
+}
+
+func FromLocal(host string) bool {
+	_url, _ := url.Parse("http://" + host)
+
+	_host := _url.Hostname()
+
+	return (_host == "localhost" || _host == "127.0.0.1")
+
 }
