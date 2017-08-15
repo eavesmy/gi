@@ -2,6 +2,17 @@ package source
 
 import ()
 
-func getHtml() {
+type One struct {
+}
+
+func (o *One) getHtml() {
+
+}
+
+func (o *One) parseHtml() {
+
+}
+
+func (o *One) saveUrl() {
 
 }

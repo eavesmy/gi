@@ -1,6 +1,8 @@
 package source
 
-import ()
+import (
+	"../manager"
+)
 
 const maxDealProcess = 5
 
@@ -19,6 +21,13 @@ type Task struct {
 var UrlList = make(chan string, maxDealProcess)
 
 func (t *Task) runTask() {
+
+	for {
+		url := <-UrlList
+	}
+}
+
+func _task() {
 
 }
 
