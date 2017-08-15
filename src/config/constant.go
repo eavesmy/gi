@@ -10,6 +10,7 @@ var m = map[string]string{
 	"URL_DB":            "1",
 	"TASK_DONE":         "1",
 	"TASK_DOING":        "2",
+	"TASK_ABORT":        "3",
 }
 
 func Get(k string) string {

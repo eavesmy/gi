@@ -2,19 +2,20 @@ package source
 
 import (
 	"../manager"
+	"strings"
 )
 
 const maxDealProcess = 5
 
-var programState *Task
+var DoingTask *Task
 
 type Task struct {
 	Total     int
 	Compelete int
 	Faild     int
 	Domin     string
-	Keys      string
-	State     int
+	Tags      []string
+	State     string
 }
 
 // var TaskList = make(chan *One, maxDealProcess)
@@ -23,8 +24,11 @@ var UrlList = make(chan string, maxDealProcess)
 func (t *Task) runTask() {
 
 	for {
-		url := <-UrlList
+		go RunOne(<-UrlList, t.Tags)
 	}
+}
+
+func (t *Task) GetState() {
 }
 
 func _task() {
@@ -33,14 +37,22 @@ func _task() {
 
 func NewTask(body *manager.Info) bool {
 
-	if programState != nil {
+	if DoingTask != nil {
 		return false
 	}
 
 	task := &Task{}
 
+	task.Faild = 0
+	task.Compelete = 0
+	task.Total = 0
+
 	task.Domin = body.Domin
-	task.Keys = body.main
+	task.Tags = func() []string {
+		return strings.Split(body.Main, ",")
+	}()
+
+	DoingTask = task
 
 	UrlList <- task.Domin
 
