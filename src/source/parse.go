@@ -1,9 +1,9 @@
 package source
 
 import (
-	"../manager"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"strings"
 )
 
 type One struct {
@@ -18,13 +18,16 @@ func (o *One) getHtml(url string) (*goquery.Document, error) {
 
 func (o *One) urlSave(url string) {
 
-	url = manager.FormatUrl(url)
+	url = o.formatUrl(url)
 
-	code := DB_Redis.SAdd("REDIS_URL_SAVE", url).Val()
+	fmt.Println(url)
+	/*
+		code := DB_Redis.SAdd("REDIS_URL_SAVE", url).Val()
 
-	if code == 1 {
-		o.Urls++
-	}
+		if code == 1 {
+			o.Urls++
+		}
+	*/
 }
 
 func (o *One) parseHtml(tags []string) {
@@ -41,8 +44,6 @@ func (o *One) parseHtml(tags []string) {
 
 		o.urlSave(href)
 	})
-
-	// fmt.Println(line, k)
 }
 
 func (o *One) done() {
@@ -59,6 +60,19 @@ func (o *One) getUrl() string {
 	// Do not remove from save.
 
 	return ""
+}
+
+func (o *One) formatUrl(url string) string {
+
+	if !strings.Contains(url, "http") && !strings.Contains(url, "www") {
+		return o.Url + url
+	}
+
+	if !strings.Contains(url, "http") && strings.Contains(url, "www") {
+		return "http:" + url
+	}
+
+	return url
 }
 
 func RunOne(url string, tags []string) {
@@ -80,7 +94,7 @@ func RunOne(url string, tags []string) {
 
 	one.parseHtml(tags)
 
-	one.done()
+	// one.done()
 
 	DoingTask.Compelete++
 
