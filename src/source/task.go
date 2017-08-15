@@ -29,9 +29,6 @@ func (t *Task) runTask() {
 }
 
 func (t *Task) GetState() {
-}
-
-func _task() {
 
 }
 
