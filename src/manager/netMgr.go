@@ -3,6 +3,7 @@ package manager
 import (
 	"../config"
 	"encoding/json"
+	"fmt"
 	"github.com/go-redis/redis"
 	"io/ioutil"
 	"net/http"
@@ -28,8 +29,17 @@ func GetBody(req *http.Request) *Info {
 	return info
 }
 
-func NewClient(url string) *http.Client {
+func NewClient(url string) (*http.Response, error) {
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
 
+	if err != nil {
+		fmt.Println("Check err ->", err)
+	}
+
+	req.Header.Add("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36")
+
+	return client.Do(req)
 }
 
 func NewRedisClient(db string) *redis.Client {

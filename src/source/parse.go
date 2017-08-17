@@ -1,6 +1,7 @@
 package source
 
 import (
+	"../manager"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	// "github.com/zemirco/couchdb"
@@ -14,7 +15,15 @@ type One struct {
 }
 
 func (o *One) getHtml(url string) (*goquery.Document, error) {
-	return goquery.NewDocument(url)
+
+	resp, err := manager.NewClient(url)
+	doc, _ := goquery.NewDocumentFromResponse(resp)
+
+	if resp.StatusCode != 200 {
+		doc = nil
+	}
+
+	return doc, err
 }
 
 func (o *One) urlSave(url string) {
@@ -86,7 +95,7 @@ func RunOne(url string, tags []string) {
 
 	doc, err := one.getHtml(url)
 
-	if err != nil {
+	if doc == nil || err != nil {
 
 		DoingTask.Faild++
 
