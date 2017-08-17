@@ -42,7 +42,6 @@ func NewTask(body *manager.Info) bool {
 
 	task.Faild = 0
 	task.Compelete = 0
-	task.Total = 0
 
 	task.Domin = body.Domin
 	task.Tags = func() []string {

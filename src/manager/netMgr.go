@@ -28,6 +28,10 @@ func GetBody(req *http.Request) *Info {
 	return info
 }
 
+func NewClient(url string) *http.Client {
+
+}
+
 func NewRedisClient(db string) *redis.Client {
 
 	dbNum, _ := strconv.Atoi(db)

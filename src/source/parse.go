@@ -3,6 +3,7 @@ package source
 import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	// "github.com/zemirco/couchdb"
 	"strings"
 )
 
@@ -20,14 +21,11 @@ func (o *One) urlSave(url string) {
 
 	url = o.formatUrl(url)
 
-	fmt.Println(url)
-	/*
-		code := DB_Redis.SAdd("REDIS_URL_SAVE", url).Val()
+	code := DB_Redis.SAdd("REDIS_URL_SAVE", url).Val()
 
-		if code == 1 {
-			o.Urls++
-		}
-	*/
+	if code == 1 {
+		o.Urls++
+	}
 }
 
 func (o *One) parseHtml(tags []string) {
@@ -48,6 +46,8 @@ func (o *One) parseHtml(tags []string) {
 
 func (o *One) done() {
 
+	DB_Redis.SAdd("REDIS_URL_DONE", o.Url)
+
 	url := o.getUrl()
 
 	if url != "" {
@@ -56,10 +56,13 @@ func (o *One) done() {
 }
 
 func (o *One) getUrl() string {
-	// From save but not in done.
-	// Do not remove from save.
+	urls := DB_Redis.SDiff("REDIS_URL_SAVE", "REDIS_URL_DONE").Val()
 
-	return ""
+	if len(urls) == 0 {
+		return ""
+	}
+
+	return urls[0]
 }
 
 func (o *One) formatUrl(url string) string {
@@ -76,6 +79,8 @@ func (o *One) formatUrl(url string) string {
 }
 
 func RunOne(url string, tags []string) {
+
+	fmt.Println("RUN THIS ->", url)
 
 	one := &One{}
 
@@ -94,9 +99,10 @@ func RunOne(url string, tags []string) {
 
 	one.parseHtml(tags)
 
-	// one.done()
+	one.done()
 
 	DoingTask.Compelete++
 
+	fmt.Println(DoingTask)
 	return
 }
