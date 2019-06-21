@@ -2,6 +2,7 @@ package gi
 
 type Config struct {
 	Method string // GET POST
+	Domain bool
 
 	MaxRuntime int // 同时处理数量
 	Timeout    int // 请求超时 unit:s
