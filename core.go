@@ -1,7 +1,6 @@
 package gi
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -31,7 +30,7 @@ type Gi struct {
 
 var chan_exit = make(chan bool, 1)
 
-func New(conf ...Config) *Gi {
+func New(conf ...*Config) *Gi {
 
 	g := &Gi{
 		Config:     &Config{Domain: true},
@@ -45,7 +44,7 @@ func New(conf ...Config) *Gi {
 	}
 
 	if len(conf) > 0 {
-		g.Config = &(conf[0])
+		g.Config = conf[0]
 	}
 
 	g.Config.SetDefault()
@@ -89,6 +88,7 @@ func (g *Gi) Go(_url string) {
 		go g.run()
 	}
 
+	g.Cache.InfoLoop(10)
 	g.stay()
 }
 
@@ -116,8 +116,6 @@ func (g *Gi) run() {
 
 func (g *Gi) mainProgram(_url string) {
 
-	fmt.Println(_url, "new request task")
-
 	g.Cache.Doing(_url)
 
 	req, err := g.Client.Do(g.Config.Method, _url)
@@ -137,7 +135,7 @@ func (g *Gi) mainProgram(_url string) {
 
 	res, err := (&http.Client{}).Do(req)
 
-	ctx := &Context{Res: res, Req: req}
+	ctx := &Context{Res: res, Req: req, Gi: g}
 	nodes, err := ctx.Html()
 
 	if err != nil {
@@ -148,32 +146,35 @@ func (g *Gi) mainProgram(_url string) {
 	ctx.Nodes = nodes
 
 	// 获取页面上所有链接
-	hrefs := ctx.GetHref()
 
-	for _, href := range hrefs {
+	if g.Config.AutoParseUrl {
+		hrefs := ctx.GetHref()
 
-		// 判断域
-		if isDomain, _ := g.url_domain(href); g.Config.Domain && !isDomain {
-			continue
-		}
+		for _, href := range hrefs {
 
-		if href == "javascript:" || href == _url+"/" || href == "/" {
-			continue
-		}
-
-		if strings.IndexAny(href, "#") == 0 && !strings.ContainsAny(href, "/") {
-			continue
-		}
-
-		// 判断链接合法
-
-		if g.url_only(href) && !g.url_filter(href) {
-
-			u, _ := url.Parse(href)
-			if u.Host == "" {
-				href = g.URL_Root + href
+			// 判断域
+			if isDomain, _ := g.url_domain(href); g.Config.Domain && !isDomain {
+				continue
 			}
-			g.Cache.Add(href)
+
+			if href == "javascript:" || href == _url+"/" || href == "/" {
+				continue
+			}
+
+			if strings.IndexAny(href, "#") == 0 && !strings.ContainsAny(href, "/") {
+				continue
+			}
+
+			// 判断链接合法
+
+			if g.url_only(href) && !g.url_filter(href) {
+
+				u, _ := url.Parse(href)
+				if u.Host == "" {
+					href = g.URL_Root + href
+				}
+				g.Cache.Add(href)
+			}
 		}
 	}
 

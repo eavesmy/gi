@@ -1,6 +1,7 @@
 package gi
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -44,16 +45,29 @@ func (c *Cache) Failed(url string, err error) {
 }
 
 func (c *Cache) Done(url string) {
+	if c.Map[url].Status == 0 {
+		return
+	}
 	c.Map[url].Status = 3
+}
+
+func (c *Cache) Refresh(url string) {
+	c.Add(url)
+
+	c.Map[url].Status = 0
 }
 
 func (c *Cache) Go() {
 
 	for u, d := range c.Map {
+		fmt.Println(u, d)
 		if d.Status == 0 {
 			c._Chan <- u
 		}
 	}
 
 	time.AfterFunc(5*time.Second, c.Go)
+}
+
+func (c *Cache) InfoLoop(s int) {
 }

@@ -7,6 +7,8 @@ type Config struct {
 	MaxRuntime int // 同时处理数量
 	Timeout    int // 请求超时 unit:s
 	RetryCount int // 重试次数
+
+	AutoParseUrl bool
 }
 
 func (c *Config) SetDefault() {

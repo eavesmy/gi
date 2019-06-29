@@ -11,6 +11,7 @@ type Context struct {
 	Res   *http.Response
 	Req   *http.Request
 	Nodes *goquery.Document
+	Gi    *Gi
 }
 
 func (c *Context) String() (string, error) {
@@ -52,4 +53,12 @@ func (c *Context) GetHref() []string {
 	})
 
 	return _map
+}
+
+func (c *Context) GetUrl() string {
+	return c.Req.URL.String()
+}
+
+func (c *Context) Refresh(_url string) {
+	c.Gi.Cache.Refresh(_url)
 }
