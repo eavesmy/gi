@@ -1,10 +1,10 @@
 package gi
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
-
 	"strings"
 )
 
