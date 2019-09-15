@@ -1,6 +1,7 @@
 package gi
 
 import (
+	"errors"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"io/ioutil"
@@ -27,9 +28,14 @@ func (c *Context) Html() (*goquery.Document, error) {
 
 	// Parse by github.com/PuerkitoBio/goquery
 
+	if c.Res.Body == nil {
+		fmt.Println(c.GetPath())
+		return nil, errors.New("res body nil")
+	}
+
 	doc, err := goquery.NewDocumentFromReader(c.Res.Body)
 
-	if err != nil {
+	if err != nil || doc == nil {
 		fmt.Println(err, doc)
 		return nil, err
 	}

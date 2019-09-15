@@ -1,7 +1,6 @@
 package gi
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -28,6 +27,7 @@ func NewCache() *Cache {
 }
 
 func (c *Cache) Add(url string) {
+
 	if _, exists := c.Map[url]; exists {
 		return
 	}
@@ -60,7 +60,6 @@ func (c *Cache) Refresh(url string) {
 func (c *Cache) Go() {
 
 	for u, d := range c.Map {
-		fmt.Println(u, d)
 		if d.Status == 0 {
 			c._Chan <- u
 		}

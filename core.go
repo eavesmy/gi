@@ -135,13 +135,15 @@ func (g *Gi) mainProgram(_url string) {
 
 	res, err := (&http.Client{}).Do(req)
 
-	ctx := &Context{Res: res, Req: req, Gi: g}
-	nodes, err := ctx.Html()
-
 	if err != nil {
+		fmt.Println("request err: ", err, _url)
 		g.Cache.Failed(_url, err)
 		return
 	}
+
+	ctx := &Context{Res: res, Req: req, Gi: g}
+
+	nodes, err := ctx.Html()
 
 	ctx.Nodes = nodes
 
