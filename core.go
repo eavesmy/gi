@@ -1,6 +1,7 @@
 package gi
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -88,7 +89,7 @@ func (g *Gi) Go(_url string) {
 		go g.run()
 	}
 
-	g.Cache.InfoLoop(10)
+	// g.Cache.InfoLoop(10)
 	g.stay()
 }
 
@@ -133,7 +134,11 @@ func (g *Gi) mainProgram(_url string) {
 		req.AddCookie(cookie)
 	}
 
-	res, err := (&http.Client{}).Do(req)
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
+	res, err := (&http.Client{Transport: tr}).Do(req)
 
 	if err != nil {
 		fmt.Println("request err: ", err, _url)

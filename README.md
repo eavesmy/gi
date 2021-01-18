@@ -1,14 +1,19 @@
 # Usage
 
-```
-	func main(){
+```golang
+import (
+    "github.com/eavesmy/gi"
+    "github.com/PuerkitoBio/goquery"
+)
 
-		app := gi.New()
+func main(){
 
-		app.Handler(func(ctx *gi.Context){
-			// handler 
-		})
+    app := gi.New()
 
-		app.Go("https://baidu.com")
-	}
+    app.Handler(func(ctx *gi.Context){
+        // handler 
+    })
+
+    app.Go("https://baidu.com")
+}
 ```
